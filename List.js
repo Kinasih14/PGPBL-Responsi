@@ -8,17 +8,19 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
+  Alert,
+  Button,
 } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faStore, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { faStore, faMapMarkerAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 
-const Createdata = () => {
+const Createdata = ({ navigation }) => {
   const jsonUrl = 'http://10.55.103.42:3000/sayur'; // Ganti dengan URL API Anda
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Mengambil data dari API saat komponen pertama kali dimuat
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,6 +56,31 @@ const Createdata = () => {
     );
   }
 
+  // Fungsi untuk menghapus data
+  const handleDelete = (id) => {
+    Alert.alert('Hapus data', 'Yakin akan menghapus data ini?', [
+      { text: 'Tidak', onPress: () => console.log('button tidak') },
+      { text: 'Ya', onPress: () => deleteData(id) },
+    ]);
+  };
+
+  // Fungsi untuk menghapus data dari API dan state
+  const deleteData = async (id) => {
+    try {
+      const response = await fetch(`${jsonUrl}/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to delete item: ${response.status}`);
+      }
+      setData(data.filter(item => item.id !== id)); // Remove deleted item from state
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+
+  // Fungsi untuk render setiap item dalam list
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image
@@ -71,22 +98,34 @@ const Createdata = () => {
       <Text style={styles.kontak}>Kontak: {item?.kontak || 'Tidak tersedia'}</Text>
       <Text style={styles.jam_buka}>Jam Buka: {item?.jam_buka || 'Tidak tersedia'}</Text>
       <Text style={styles.keterangan}>Keterangan: {item?.keterangan || 'Tidak tersedia'}</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          if (item?.location?.latitude && item?.location?.longitude) {
-            Linking.openURL(
-              `https://www.google.com/maps?q=${item.location.latitude},${item.location.longitude}`
-            );
-          } else {
-            alert('Lokasi tidak tersedia');
-          }
-        }}
-      >
-        <Text style={styles.buttonText}>
-          <FontAwesomeIcon icon={faMapMarkerAlt} color="white" /> Lihat Lokasi
-        </Text>
-      </TouchableOpacity>
+
+      <View style={styles.buttonContainer}>
+        {/* Tombol untuk melihat lokasi */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (item?.location?.latitude && item?.location?.longitude) {
+              Linking.openURL(
+                `https://www.google.com/maps?q=${item.location.latitude},${item.location.longitude}`
+              );
+            } else {
+              alert('Lokasi tidak tersedia');
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>
+            <FontAwesomeIcon icon={faMapMarkerAlt} color="white" /> Lihat Lokasi
+          </Text>
+        </TouchableOpacity>
+
+        {/* Tombol Hapus dengan Alert */}
+        <Button 
+          title="Hapus"
+          onPress={() => handleDelete(item.id)} // Panggil handleDelete
+          color={'red'}
+        />
+
+      </View>
     </View>
   );
 
@@ -178,12 +217,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginBottom: 5,
   },
-  button: {
+  buttonContainer: {
+    flexDirection: 'row',
     marginTop: 10,
+    justifyContent: 'space-between',
+  },
+  button: {
     padding: 10,
-    backgroundColor: '#2e7d32',
     borderRadius: 5,
     alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
     color: 'white',

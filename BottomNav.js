@@ -4,9 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from './home';
 import List from './List';
+import Edit from './Editdata';
 import Map from './Map';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import {faUser,  faHouse, faCarrot, faMapLocationDot,} from '@fortawesome/free-solid-svg-icons';
+import {faUserPen,  faHouse, faCarrot, faMapLocationDot, faUser,} from '@fortawesome/free-solid-svg-icons';
 import { WebView } from 'react-native-webview';
 function HomeScreen() {
   return (
@@ -19,12 +20,17 @@ function ListScreen() {
     <List />
   );
 }
-
+function EditScreen() {
+  return (
+    <Edit/>
+  );
+}
 function MapScreen() {
   return (
     <Map/>
   );
 }
+
 
 const Tab = createBottomTabNavigator();
 
@@ -41,11 +47,17 @@ export default function App() {
         tabBarIcon: ({ color }) => (
           <FontAwesomeIcon icon={faCarrot} color={color} size={20} />
         ),}}/>
-
+        <Tab.Screen name="Edit" component={EditScreen}  options={{ 
+        tabBarIcon: ({ color }) => (
+          <FontAwesomeIcon icon={faUserPen} color={color} size={20} />
+        ),}}/>
       <Tab.Screen name="Map" component={MapScreen}  options={{ 
         tabBarIcon: ({ color }) => (
           <FontAwesomeIcon icon={faMapLocationDot} color={color} size={20} />
         ),}}/>
+    
+
+      
 
       </Tab.Navigator>
     </NavigationContainer>

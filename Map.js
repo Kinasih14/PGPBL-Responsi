@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
+  Image,
 } from 'react-native';
 import MapLibreGL from '@maplibre/maplibre-react-native';
 import Geolocation from 'react-native-geolocation-service';
@@ -23,6 +24,8 @@ export default class App extends Component {
       userLocation: null,
       newMarkerLocation: null,
       isFormVisible: false,
+      isPopupVisible: false,
+      popupData: null,
       formData: {
         id: '',
         toko: '',
@@ -134,8 +137,6 @@ export default class App extends Component {
           id: '',
           toko: '',
           kategori: '',
-          rating: '',
-          ulasan: '',
           alamat: '',
           kontak: '',
           jam_buka: '',
@@ -154,12 +155,21 @@ export default class App extends Component {
 
   // Fungsi untuk menyimpan marker baru ke API
   saveNewMarker = async () => {
-    const { formData, warung } = this.state;
+    const { formData } = this.state;
 
-    // Validasi input dan koordinat
-    if (!formData.toko || !formData.kategori || !formData.ulasan) {
-      Alert.alert('Error', 'Please fill all fields before saving.');
-      return;
+    // Pastikan tidak ada field kosong
+    const requiredFields = [
+      'toko', 'kategori', 'ulasan', 'alamat', 
+      'kontak', 'jam_buka', 'foto', 'keterangan'
+    ];
+
+    // Cek apakah ada field yang kosong
+    for (let field of requiredFields) {
+      // Pastikan field tidak kosong atau hanya berisi spasi
+      if (!formData[field] || formData[field].trim() === '') {
+        Alert.alert('Error', `Please fill in the ${field} field before saving.`);
+        return;
+      }
     }
 
     const latitude = parseFloat(formData.location.latitude);
@@ -224,13 +234,41 @@ export default class App extends Component {
           key={sayur.id}
           id={String(sayur.id)}
           coordinate={[longitude, latitude]}
+          onPress={() => this.showPopup(sayur)}
         />
       );
     });
   }
 
+  // Menampilkan popup untuk menampilkan nama toko dan foto
+  renderPopup() {
+    const { selectedMarker } = this.state;
+  
+    if (!selectedMarker) return null; // Don't show popup if no marker is selected
+  
+    return (
+      <Modal visible={true} transparent={true} animationType="fade">
+        <View style={styles.popupContainer}>
+          <Text style={styles.popupTitle}>{selectedMarker.toko}</Text>
+          {selectedMarker.foto && (
+            <Image
+              source={{ uri: selectedMarker.foto }}
+              style={styles.popupImage}
+            />
+          )}
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => this.setState({ selectedMarker: null })}
+          >
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    );
+  }
+
   render() {
-    const { isFormVisible, formData } = this.state;
+    const { isFormVisible, formData, isPopupVisible, popupData } = this.state;
 
     return (
       <View style={styles.page}>
@@ -268,18 +306,6 @@ export default class App extends Component {
             />
             <TextInput
               style={styles.input}
-              placeholder="Rating"
-              value={formData.rating}
-              onChangeText={(text) => this.setState({ formData: { ...formData, rating: text } })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Ulasan"
-              value={formData.ulasan}
-              onChangeText={(text) => this.setState({ formData: { ...formData, ulasan: text } })}
-            />
-            <TextInput
-              style={styles.input}
               placeholder="Alamat"
               value={formData.alamat}
               onChangeText={(text) => this.setState({ formData: { ...formData, alamat: text } })}
@@ -300,7 +326,7 @@ export default class App extends Component {
               style={styles.input}
               placeholder="Foto"
               value={formData.foto}
-              onChangeText={(text) => this.setState({ formData: { ...formData, foto: image } })}
+              onChangeText={(text) => this.setState({ formData: { ...formData, foto: text } })}
             />
             <TextInput
               style={styles.input}
@@ -308,6 +334,8 @@ export default class App extends Component {
               value={formData.keterangan}
               onChangeText={(text) => this.setState({ formData: { ...formData, keterangan: text } })}
             />
+
+            {/* Other form fields... */}
             <TouchableOpacity style={styles.saveButton} onPress={this.saveNewMarker}>
               <Text style={styles.saveButtonText}>Save</Text>
             </TouchableOpacity>
@@ -316,6 +344,21 @@ export default class App extends Component {
               onPress={() => this.setState({ isFormVisible: false })}
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
+
+        {/* Popup untuk menampilkan nama toko dan foto */}
+        <Modal visible={isPopupVisible} animationType="fade" transparent>
+          <View style={styles.popupContainer}>
+            <Text style={styles.popupTitle}>{popupData?.toko}</Text>
+            {popupData?.foto ? (
+              <Image source={{ uri: popupData.foto }} style={styles.popupImage} />
+            ) : (
+              <Text>No photo available</Text>
+            )}
+            <TouchableOpacity style={styles.closeButton} onPress={this.closePopup}>
+              <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
         </Modal>
@@ -329,7 +372,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#F8F8F8',
   },
   map: {
     flex: 1,
@@ -343,32 +386,67 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     color: '#fff',
     marginBottom: 20,
   },
   input: {
     backgroundColor: '#fff',
-    padding: 10,
-    width: '80%',
+    padding: 12,
+    width: '85%',
     marginBottom: 15,
-    borderRadius: 5,
+    borderRadius: 8,
   },
   saveButton: {
     backgroundColor: '#58c7ff',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+    padding: 12,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 10,
+    alignItems: 'left',
+    justifyContent: 'left',
   },
   saveButtonText: {
     color: '#fff',
+    textAlign: 'left',
+    fontWeight: 'bold',
   },
   cancelButton: {
     backgroundColor: '#ff5c5c',
-    padding: 10,
-    borderRadius: 5,
+    padding: 12,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: 'right',
+    justifyContent: 'right',
   },
   cancelButtonText: {
     color: '#fff',
+    textAlign: 'right',
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    padding: 10,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  closeButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  popupContainer: {
+    backgroundColor: '#ffffff',
+    padding: 20,
+    borderRadius: 10,
+    marginTop: '20%',
+  },
+  popupTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  popupImage: {
+    width: 100,
+    height: 100,
+    marginTop: 10,
   },
 });
