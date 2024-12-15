@@ -1,79 +1,66 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
-# Getting Started
+🌱 **Aplikasi AgriGo - Sayur Segar untuk Semua** 🥕 
+======================================================================
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+🎯**Tujuan Aplikasi**: 
+Aplikasi AgriGo bertujuan untuk mempermudah masyarakat dalam membeli sayur segar secara online. Menyediakan berbagai pilihan sayuran lokal berkualitas tinggi yang dapat diakses kapan saja dan diantar langsung ke pintu rumah.
 
-## Step 1: Start the Metro Server
+🌟 **Latar Belakang**
+Di tengah kesibukan masyarakat modern, memperoleh sayuran segar yang berkualitas bisa menjadi tantangan. AgriGo hadir untuk memecahkan masalah ini dengan memberikan kemudahan dalam membeli sayuran langsung dari petani lokal. Aplikasi ini memungkinkan pengguna untuk mendapatkan sayuran segar dengan cara yang lebih praktis dan efisien, tanpa harus keluar rumah.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+🏙️ **Masalah yang Dihadapi**
+Banyak masyarakat yang kesulitan untuk mendapatkan sayuran segar dengan harga yang terjangkau dan berkualitas. Terlebih lagi, keberagaman pasar lokal sering membuat konsumen bingung memilih sayuran yang segar dan sehat. AgriGo hadir untuk mengatasi masalah tersebut dengan menyediakan berbagai pilihan sayuran berkualitas langsung dari petani.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+🚀 **Fitur Utama Aplikasi** 
+Aplikasi AgriGo dilengkapi dengan berbagai fitur yang dirancang untuk memberikan pengalaman terbaik bagi penggunanya. Berikut adalah fitur-fitur utama:
 
-```bash
-# using npm
-npm start
+🔐 1. **Halaman HomeScreen**
+-Tampilan awal pada aplikasi, pengguna dapat melihat beberapa contoh warung yang di arahkan langsung ke Google Maps
 
-# OR using Yarn
-yarn start
-```
+<img width="202" alt="home" src="https://github.com/user-attachments/assets/8a927e9c-e31f-4ef4-a5f8-435211ff588f" />
 
-## Step 2: Start your Application
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+🥕 2. **List Warung yang menjual Sayuran Segar**
+- Menampilkan list dari berbagai warung yang menjual pilihan sayur segar yang diproduksi secara lokal.
+- Setiap warung dilengkapi dengan informasi detail, termasuk rating, ulasan, alamat, titik koordinat, jenis warung, dan gambar.
+- Sayuran dipanen langsung dari petani lokal dan dikirim dalam kondisi segar
 
-### For Android
+<img width="201" alt="list data" src="https://github.com/user-attachments/assets/51aa6e5b-82da-463f-84d3-912b90f85b89" />
 
-```bash
-# using npm
-npm run android
 
-# OR using Yarn
-yarn android
-```
+🌍 3. **Maps titik warung**
+- menampilkan persebaran titik warung/toko/grosir yang menjual sayur segar dengan marker merah
+- pengguna dapat melihat seberapa jauh warung dari titik lokasi pengguna berada dengan memanfaatkan google maps
+- dapat menambah titik secara langsung dengan klik pada peta
 
-### For iOS
+<img width="202" alt="map_ada titik" src="https://github.com/user-attachments/assets/a40fd4eb-93b6-4789-a452-60ebcba5e4bb" />
 
-```bash
-# using npm
-npm run ios
 
-# OR using Yarn
-yarn ios
-```
+✏️ 4. **Edit data warung**
+- Penjual/petani lokal dapat menambahkan warung miliknya berdasarkan template informasi detail seperti nama toko, lokasi koordinat, foto, keterangan, kategori, kontak, jam buka, rating, ulasan, dan lain-lain
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+<img width="205" alt="edit data" src="https://github.com/user-attachments/assets/a8e29da9-a1a6-46e1-b868-7f962d1b6a2f" />
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+   
+(+)5. **Form Tambah titik warung**
+- pengguna dapat menambahkan warung dengan rincian yang jelas agar menjadi informasi yang dapat membantu orang yang akan membeli sayur
 
-## Step 3: Modifying your App
+<img width="207" alt="Tambah warung" src="https://github.com/user-attachments/assets/a01a0a8e-2691-45f3-b63f-91d8153b6cde" />
 
-Now that you have successfully run the app, let's modify it.
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+⚙️ **Komponen Pembangun Produk:**
+1. Frontend (UI/UX):
+- React Native: Digunakan untuk membangun aplikasi mobile yang kompatibel di Android dan iOS.
+- Fontawesome: Untuk menambahkan icon menarik dan interaktif.
+- React Navigation: Untuk pengaturan navigasi antar halaman. Komponen ini meliputi pembuatan Homescreen, ListScreen, EditScreen, dan MapSCreen
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+2. Backend (Server-side):
+- Map libre untuk menampilkan peta pada aplikasi
+- json-server: Database untuk menyimpan data produk, pengguna, dan transaksi.
 
-## Congratulations! :tada:
+📊 **Sumber Data:**
+- Lokasi Warung Sayuran Segar: Diperoleh dari scrawling data di Google Maps.
+- Rute ke warung: Menggunakan rute dari Google Maps
+- Ulasan Pengguna: Data ulasan dan rating berasal dari feedback pengguna - yang telah membeli produk.
+- Basemap aplikasi dengan memanfaatkan Map Libre
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
