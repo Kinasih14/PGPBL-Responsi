@@ -19,16 +19,21 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      pengaduanData: [],
+      warung: [],
       userLocation: null,
       newMarkerLocation: null,
       isFormVisible: false,
       formData: {
         id: '',
-        category: '',
-        title: '',
-        report: '',
-        date: '',
+        toko: '',
+        kategori: '',
+        rating: '',
+        ulasan: '',
+        alamat: '',
+        kontak: '',
+        jam_buka: '',
+        foto: '',
+        keterangan: '',
         location: {
           latitude: null,
           longitude: null,
@@ -96,12 +101,12 @@ export default class App extends Component {
         throw new Error('Failed to fetch markers');
       }
       const data = await response.json();
-      const cleanedData = data.map((pengaduan) => ({
-        ...pengaduan,
-        latitude: parseFloat(pengaduan.location.latitude),
-        longitude: parseFloat(pengaduan.location.longitude),
+      const cleanedData = data.map((sayur) => ({
+        ...sayur,
+        latitude: parseFloat(sayur.location.latitude),
+        longitude: parseFloat(sayur.location.longitude),
       }));
-      this.setState({ pengaduanData: cleanedData });
+      this.setState({ warung: cleanedData });
     } catch (error) {
       console.error('Error fetching markers:', error);
       Alert.alert('Error', 'Failed to load markers from API.');
@@ -111,117 +116,118 @@ export default class App extends Component {
   // Method to handle map press for new marker
   onMapPress = (e) => {
     const coordinates = e.geometry?.coordinates;
-  
+
     if (Array.isArray(coordinates)) {
       const longitude = parseFloat(coordinates[0]);
       const latitude = parseFloat(coordinates[1]);
-  
+
       // Validasi koordinat
       if (isNaN(longitude) || isNaN(latitude)) {
         Alert.alert('Error', 'Invalid coordinates. Please try again.');
         return;
       }
-  
+
       this.setState({
         newMarkerLocation: { longitude, latitude },
         isFormVisible: true,
         formData: {
           id: '',
-          category: '',
-          title: '',
-          report: '',
-          date: new Date().toISOString().split('T')[0],
+          toko: '',
+          kategori: '',
+          rating: '',
+          ulasan: '',
+          alamat: '',
+          kontak: '',
+          jam_buka: '',
+          foto: '',
+          keterangan: '',
           location: { latitude, longitude },
         },
       });
-  
+
       console.log('New marker coordinates:', longitude, latitude);
     } else {
       console.error('Invalid coordinates:', coordinates);
       Alert.alert('Error', 'Failed to retrieve coordinates.');
     }
   };
-  
 
   // Fungsi untuk menyimpan marker baru ke API
   saveNewMarker = async () => {
-    const { formData, pengaduanData } = this.state;
-  
+    const { formData, warung } = this.state;
+
     // Validasi input dan koordinat
-    if (!formData.title || !formData.report || !formData.category) {
+    if (!formData.toko || !formData.kategori || !formData.ulasan) {
       Alert.alert('Error', 'Please fill all fields before saving.');
       return;
     }
-  
+
     const latitude = parseFloat(formData.location.latitude);
     const longitude = parseFloat(formData.location.longitude);
-  
+
     if (isNaN(latitude) || isNaN(longitude)) {
       Alert.alert('Error', 'Invalid coordinates. Please check the location.');
       return;
     }
-  
+
     // Update formData dengan nilai konversi
     const updatedFormData = {
       ...formData,
       location: { latitude, longitude },
     };
-  
+
     console.log('Saving marker with data:', updatedFormData);
-  
+
     try {
       const response = await fetch('http://10.55.103.42:3000/sayur', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedFormData),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to save marker');
       }
-  
+
       const newMarker = await response.json();
-      
+
       // Refresh data dari server
       this.fetchMarkers();
-  
+
       this.setState({
         isFormVisible: false,
         newMarkerLocation: null,
       });
-  
+
       Alert.alert('Success', 'Marker has been saved successfully!');
     } catch (error) {
       console.error('Error saving marker:', error);
       Alert.alert('Error', 'Failed to save marker.');
     }
   };
-  
-  
 
   // Fungsi untuk merender marker
   renderMarkers() {
-    const { pengaduanData } = this.state;
-  
-    return pengaduanData.map((pengaduan) => {
-      const longitude = parseFloat(pengaduan.longitude);
-      const latitude = parseFloat(pengaduan.latitude);
-  
+    const { warung } = this.state;
+
+    return warung.map((sayur) => {
+      const longitude = parseFloat(sayur.longitude);
+      const latitude = parseFloat(sayur.latitude);
+
       if (isNaN(longitude) || isNaN(latitude)) {
-        console.warn(`Invalid coordinates for marker ID: ${pengaduan.id}`);
+        console.warn(`Invalid coordinates for marker ID: ${sayur.id}`);
         return null; // Skip invalid markers
       }
-  
+
       return (
         <MapLibreGL.PointAnnotation
-          key={pengaduan.id}
-          id={String(pengaduan.id)}
+          key={sayur.id}
+          id={String(sayur.id)}
           coordinate={[longitude, latitude]}
         />
       );
     });
   }
-  
 
   render() {
     const { isFormVisible, formData } = this.state;
@@ -241,24 +247,66 @@ export default class App extends Component {
         {/* Form untuk input data marker */}
         <Modal visible={isFormVisible} animationType="slide" transparent>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Add New Marker</Text>
+            <Text style={styles.modalTitle}>Tambah Warung Sayur Baru</Text>
             <TextInput
               style={styles.input}
-              placeholder="Category"
-              value={formData.category}
-              onChangeText={(text) => this.setState({ formData: { ...formData, category: text } })}
+              placeholder="id"
+              value={formData.id}
+              onChangeText={(text) => this.setState({ formData: { ...formData, id: text } })}
             />
             <TextInput
               style={styles.input}
-              placeholder="Title"
-              value={formData.title}
-              onChangeText={(text) => this.setState({ formData: { ...formData, title: text } })}
+              placeholder="Toko"
+              value={formData.toko}
+              onChangeText={(text) => this.setState({ formData: { ...formData, toko: text } })}
             />
             <TextInput
               style={styles.input}
-              placeholder="Report"
-              value={formData.report}
-              onChangeText={(text) => this.setState({ formData: { ...formData, report: text } })}
+              placeholder="Kategori"
+              value={formData.kategori}
+              onChangeText={(text) => this.setState({ formData: { ...formData, kategori: text } })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Rating"
+              value={formData.rating}
+              onChangeText={(text) => this.setState({ formData: { ...formData, rating: text } })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Ulasan"
+              value={formData.ulasan}
+              onChangeText={(text) => this.setState({ formData: { ...formData, ulasan: text } })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Alamat"
+              value={formData.alamat}
+              onChangeText={(text) => this.setState({ formData: { ...formData, alamat: text } })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Kontak"
+              value={formData.kontak}
+              onChangeText={(text) => this.setState({ formData: { ...formData, kontak: text } })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Jam Buka"
+              value={formData.jam_buka}
+              onChangeText={(text) => this.setState({ formData: { ...formData, jam_buka: text } })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Foto"
+              value={formData.foto}
+              onChangeText={(text) => this.setState({ formData: { ...formData, foto: image } })}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Keterangan"
+              value={formData.keterangan}
+              onChangeText={(text) => this.setState({ formData: { ...formData, keterangan: text } })}
             />
             <TouchableOpacity style={styles.saveButton} onPress={this.saveNewMarker}>
               <Text style={styles.saveButtonText}>Save</Text>

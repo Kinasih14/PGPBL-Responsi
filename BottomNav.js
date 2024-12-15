@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from './home';
-import Toko from './toko';
+import List from './List';
 import Map from './Map';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {faUser,  faHouse, faCarrot, faMapLocationDot,} from '@fortawesome/free-solid-svg-icons';
@@ -16,7 +16,7 @@ function HomeScreen() {
 
 function ListScreen() {
   return (
-    <Toko />
+    <List />
   );
 }
 
